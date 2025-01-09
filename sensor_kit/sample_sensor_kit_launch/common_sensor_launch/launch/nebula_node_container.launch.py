@@ -174,24 +174,24 @@ def launch_setup(context, *args, **kwargs):
                 ("~/input/twist", "/sensing/vehicle_velocity_converter/twist_with_covariance"),
                 ("~/input/imu", "/sensing/imu/imu_data"),
                 ("~/input/pointcloud", "mirror_cropped/pointcloud_ex"),
-                ("~/output/pointcloud", "rectified/pointcloud_ex"),
+                ("~/output/pointcloud", "/sensing/lidar/concatenated/pointcloud"), # JSJ250109
             ],
             extra_arguments=[{"use_intra_process_comms": LaunchConfiguration("use_intra_process")}],
         )
     )
 
-    nodes.append(
-        ComposableNode(
-            package="pointcloud_preprocessor",
-            plugin="pointcloud_preprocessor::RingOutlierFilterComponent",
-            name="ring_outlier_filter",
-            remappings=[
-                ("input", "rectified/pointcloud_ex"),
-                ("output", "pointcloud"),
-            ],
-            extra_arguments=[{"use_intra_process_comms": LaunchConfiguration("use_intra_process")}],
-        )
-    )
+    # nodes.append(
+    #     ComposableNode(
+    #         package="pointcloud_preprocessor",
+    #         plugin="pointcloud_preprocessor::RingOutlierFilterComponent",
+    #         name="ring_outlier_filter",
+    #         remappings=[
+    #             ("input", "rectified/pointcloud_ex"),
+    #             ("output", "pointcloud"),
+    #         ],
+    #         extra_arguments=[{"use_intra_process_comms": LaunchConfiguration("use_intra_process")}],
+    #     )
+    # )
 
     # set container to run all required components in the same process
     container = ComposableNodeContainer(
@@ -294,6 +294,7 @@ def generate_launch_description():
         "container_executable",
         "component_container",
         condition=UnlessCondition(LaunchConfiguration("use_multithread")),
+    )
     )
 
     set_container_mt_executable = SetLaunchConfiguration(
